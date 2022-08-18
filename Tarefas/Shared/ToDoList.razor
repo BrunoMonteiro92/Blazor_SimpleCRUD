@@ -1,0 +1,70 @@
+﻿<h1>@Title</h1>
+
+@if (toDos == null)
+{
+    <Alert Mensagem="Loading..." />
+}
+else if (!toDos.Any())
+{
+    <Alert Mensagem="No tasks found..." />
+}
+else
+{
+    <table class="table">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Description</th>
+                <th scope="col">Finished</th>
+                <th scope="col">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in toDos)
+            {
+                <tr>
+                    <IndividualToDo item="item" />
+                    <td><button class="btn btn-danger btn-sm" @onclick="@(() => RemoveTask(item.Id))"><i class="oi oi-trash"></i></button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<br />
+
+@if (toDos != null)
+{
+    <div class="form-row">
+        <label for="newTask">Insert new task:</label>
+        <input type="text" id="newTask" placeholder="Enter the new task" @bind="@newTask">
+    </div>
+    <button type="submit" class="btn btn-primary" @onclick="AddTask">Submit</button>
+}
+
+@code {
+
+    [Parameter] public List<ToDo>? toDos { get; set; }
+    [Parameter] public string? Title { get; set; }
+
+    private string newTask = "";
+
+    void AddTask()
+    {
+        if (!string.IsNullOrWhiteSpace(newTask))
+        {
+            toDos.Add(new ToDo
+                {
+                    CreatedAt = DateTime.Now,
+                    Description = newTask,
+                    Id = Guid.NewGuid()
+                });
+            newTask = "";
+        }
+    }
+
+    private void RemoveTask(Guid id)
+    {
+        toDos.Remove(toDos.First(t => t.Id == id));
+    }
+}

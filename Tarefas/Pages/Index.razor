@@ -1,88 +1,22 @@
 ﻿@page "/"
 @inject HttpClient http
 
-<PageTitle>Index</PageTitle>
+<PageTitle>To Do List</PageTitle>
 
-@if (tasks == null)
-{
-    <p>Loading...</p>
-}
-else if (!tasks.Any())
-{
-    <p>No tasks found...</p>
-}
-else
-{
-    <table class="table">
-        <thead class="thead-dark">
-            <tr>
-                <th scope="col">Date</th>
-                <th scope="col">Description</th>
-                <th scope="col">Finished</th>
-                <th scope="col">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in tasks)
-            {
-                <tr>
-                    <th>@item.createdAt</th>
-                    <td>@item.description</td>
-                    <td><input type="checkbox" @bind="@item.finished" /></td>
-                    <td><button class="btn btn-danger btn-sm" @onclick="@(() => RemoveTask(item.id))"><i class="oi oi-trash"></i></button></td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-
-<br />
-
-@if (tasks != null)
-{
-    <div class="form-row">
-        <label for="newTask">Insert new task:</label>
-        <input type="text" id="newTask" placeholder="Enter the new task" @bind="@newTask">
-    </div>
-    <button type="submit" class="btn btn-primary" @onclick="AddTask">Submit</button>
-}
+<ToDoList Title="To Do List" toDos="GetToDos()" />
 
 @code {
+    List<ToDo> toDos = new List<ToDo>();
+
     protected override async Task OnInitializedAsync()
     {
-        tasks = await http.GetFromJsonAsync<List<ToDo>>(
+        toDos = await http.GetFromJsonAsync<List<ToDo>>(
             "https://gist.githubusercontent.com/BrunoMonteiro92/a9e373b7f5de9ab71b0ce4dd6285ccfd/raw/2fd936699a0cf645d72d5676587089784bd299ff/data.json"
         );
     }
 
-    public class ToDo
+    private List<ToDo> GetToDos()
     {
-        public Guid id { get; set; }
-        public string? description { get; set; }
-        public bool finished { get; set; }
-        public DateTime createdAt { get; set; }
-    }
-
-    private string newTask = "";
-
-    private List<ToDo> tasks = new List<ToDo>();
-
-    void AddTask()
-    {
-        if (!string.IsNullOrWhiteSpace(newTask))
-        {
-            tasks.Add(new ToDo
-                {
-                    createdAt = DateTime.Now,
-                    description = newTask,
-                    id = Guid.NewGuid()
-                });
-            newTask = "";
-        }
-    }
-
-    private void RemoveTask(Guid id)
-    {
-        tasks.Remove(tasks.First(t => t.id == id));
+        return toDos;
     }
 }

@@ -1,0 +1,7 @@
+﻿<th>@item.CreatedAt</th>
+<td>@item.Description</td>
+<td><input type="checkbox" @bind="@item.Finished" /></td>
+
+@code {
+    [Parameter] public ToDo item { get; set; }
+}
